@@ -340,11 +340,41 @@ def spin_motivational_metadata(
     config.reload()
     api_key = config.GROQ_API_KEY
 
-    clean_speaker = speaker_name.strip() if speaker_name else "Dr Mario"
-    is_spanish = bool(re.search(r'[áéíóúñ¿¡]', f"{original_title} {original_description} {transcript}", re.IGNORECASE)) or any(w in f"{original_title.lower()} {transcript[:200].lower()}" for w in [" en ", " de ", " la ", " el ", " tu ", " que ", " como ", " para "])
+    clean_speaker = speaker_name.strip() if speaker_name else "Especialistas"
+    is_portuguese = bool(re.search(r'[ãõçáéíóúâêîôû]', f"{original_title} {original_description} {transcript}", re.IGNORECASE)) and any(w in f"{original_title.lower()} {transcript[:200].lower()}" for w in [" você", " não", " com ", " para ", " sua ", " suas ", " seu ", " seus ", " como ", " aprendizados", " fases", " autoconhecimento", " mais "])
+    is_spanish = not is_portuguese and (bool(re.search(r'[áéíóúñ¿¡]', f"{original_title} {original_description} {transcript}", re.IGNORECASE)) or any(w in f"{original_title.lower()} {transcript[:200].lower()}" for w in [" en ", " de ", " la ", " el ", " tu ", " que ", " como ", " para "]))
 
     def _fallback_spin():
-        if is_spanish:
+        if is_portuguese:
+            templates = [
+                f"A Verdade Sobre a Sua Mente Que Ninguém Te Conta | {clean_speaker}",
+                f"O Segredo Emocional Que Muda a Sua Vida | {clean_speaker}",
+                f"Por Que 99% das Pessoas Perdem o Seu Foco | {clean_speaker}",
+                f"Faça Isso e Transforme o Seu Bem-Estar Interior | {clean_speaker}",
+                f"O Que Ninguém Te Disse Sobre Maturidade Emocional | {clean_speaker}",
+            ]
+            spun_title = truncate_title(random.choice(templates), max_length=70)
+            spun_desc = (
+                f"Uma reflexão transformadora sobre autoconhecimento, inteligência emocional e desenvolvimento pessoal com {clean_speaker}.\n\n"
+                f"\"A vida é feita de fases, escolhas, desafios e descobertas. E cada experiência traz um aprendizado valioso.\"\n\n"
+                f"Voz / Orador: {clean_speaker}\n"
+                f"Canal: Entre Fases e Aprendizados\n\n"
+                f"Inscreva-se em Entre Fases e Aprendizados para mais reflexões, sabedoria e desenvolvimento pessoal."
+            )
+            base_tags = [
+                clean_speaker.lower(),
+                "entre fases e aprendizados",
+                "desenvolvimento pessoal",
+                "autoconhecimento",
+                "inteligencia emocional",
+                "relacionamentos",
+                "bem-estar emocional",
+                "reflexao",
+                "sabedoria",
+                "fases da vida",
+                "superacao",
+            ]
+        elif is_spanish:
             templates = [
                 f"La Verdad Sobre Tu Mente Que Nadie Te Cuenta | {clean_speaker}",
                 f"La Regla Neurocientífica Que Cambia Tu Cerebro | {clean_speaker}",
@@ -354,25 +384,21 @@ def spin_motivational_metadata(
             ]
             spun_title = truncate_title(random.choice(templates), max_length=70)
             spun_desc = (
-                f"Poderoso mensaje de {clean_speaker} sobre psicología, disciplina, mentalidad y superación personal.\n\n"
-                f"\"Si quieres cambiar tu vida, debes estar dispuesto a hacer lo que la mayoría evita.\"\n\n"
+                f"Poderoso mensaje de {clean_speaker} sobre psicología, desarrollo personal, mentalidad y autoconocimiento.\n\n"
+                f"\"Cada fase de la vida trae consigo una lección indispensable para crecer.\"\n\n"
                 f"Voz / Orador: {clean_speaker}\n"
-                f"Canal: Hábitos de Acero\n\n"
-                f"Suscríbete a Hábitos de Acero para tu dosis de disciplina, mentalidad y crecimiento personal."
+                f"Canal: Entre Fases e Aprendizados\n\n"
+                f"Suscríbete a Entre Fases e Aprendizados para reflexiones diarias y evolución interior."
             )
             base_tags = [
                 clean_speaker.lower(),
-                "habitos de acero",
-                "dr mario",
-                "mario alonso puig",
-                "motivacion",
-                "psicologia",
+                "entre fases e aprendizados",
                 "desarrollo personal",
-                "disciplina",
-                "mentalidad ganadora",
-                "exito",
-                "superacion personal",
-                "liderazgo",
+                "psicologia",
+                "autoconocimiento",
+                "inteligencia emocional",
+                "bienestar emocional",
+                "reflexiones",
             ]
         else:
             templates = [
@@ -384,22 +410,19 @@ def spin_motivational_metadata(
             ]
             spun_title = truncate_title(random.choice(templates), max_length=70)
             spun_desc = (
-                f"Powerful motivational speech featuring {clean_speaker} on mindset, relentless discipline, and overcoming adversity.\n\n"
-                f"\"If you want to change your life, you have to be willing to do the things everyone else avoids.\"\n\n"
+                f"Powerful speech featuring {clean_speaker} on mindset, self-growth, and emotional wisdom.\n\n"
+                f"\"Every phase of life brings a lesson to help you grow.\"\n\n"
                 f"Speaker: {clean_speaker}\n"
-                f"Channel: Hábitos de Acero\n\n"
-                f"Subscribe to Hábitos de Acero for daily motivation, life lessons, and personal growth."
+                f"Channel: Entre Fases e Aprendizados\n\n"
+                f"Subscribe to Entre Fases e Aprendizados for personal development and wisdom."
             )
             base_tags = [
                 clean_speaker.lower(),
-                f"{clean_speaker.lower()} motivation",
-                f"{clean_speaker.lower()} speech",
-                "motivation",
-                "motivational speech",
-                "discipline",
-                "mental toughness",
+                "entre fases e aprendizados",
+                "personal growth",
+                "self development",
+                "emotional intelligence",
                 "mindset",
-                "success motivation",
             ]
         return {
             "title": spun_title,
@@ -411,7 +434,7 @@ def spin_motivational_metadata(
 
     is_generic_speaker = clean_speaker.lower() in (
         "motivational speaker", "motivational leader", "inspirational leader",
-        "habitos de acero", "hábitos de acero", "sabiduría diaria", "sabiduria diaria", "unknown", "orador motivacional"
+        "entre fases e aprendizados", "entre fases", "unknown", "especialistas"
     )
 
     if mock or not api_key or api_key.startswith("gsk_placeholder") or "your_" in api_key:
@@ -433,23 +456,23 @@ def spin_motivational_metadata(
         )
 
         prompt = (
-            "You are an elite YouTube SEO strategist specializing in high-performing educational & motivational self-improvement channels (like Hábitos de Acero, Sabiduría Diaria, Motiversity).\n"
-            "IMPORTANT: Detect the source language. If the source title or transcript is in Spanish, ALL output (title, description, tags) MUST BE IN SPANISH (Español). If English, output in English.\n"
+            "You are an elite YouTube SEO strategist specializing in high-performing self-development, personal growth, and emotional well-being channels (like Entre Fases e Aprendizados).\n"
+            "IMPORTANT: Detect the source language. If Portuguese or Brazilian, ALL output (title, description, tags) MUST BE IN NATURAL PORTUGUESE (Português). If Spanish, output in Spanish. If English, output in English.\n"
             "Given the original video title, description, and transcript snippet below, generate:\n\n"
             "1. TITLE (50-78 characters max):\n"
-            "   - Re-write or optimize the original title for maximum CTR and curiosity gap.\n"
+            "   - Re-write or optimize the original title for maximum CTR and curiosity gap in the target language.\n"
             f"{title_rule}"
             "   - Clean formatting: Capitalize First Letters, no all-caps sentences, no emojis.\n"
             "   - High CTR, direct, intriguing, urgent.\n\n"
             "2. DESCRIPTION (150-250 words in the same language):\n"
-            f"   - Line 1 MUST be 3-4 top niche hashtags: #{clean_speaker.lower().replace(' ', '')} #habitosdeacero #desarrollopersonal #disciplina\n"
+            f"   - Line 1 MUST be 3-4 top niche hashtags: #{clean_speaker.lower().replace(' ', '')} #entrefases #desenvolvimentopessoal #autoconhecimento\n"
             "   - Next 2-3 sentences: An irresistible hook explaining why the viewer must watch, summarizing the core insight.\n"
             "   - Highlight a powerful quote extracted from the transcript in quotes.\n"
             f"   - Editorial credit: 'Voz / Orador: {clean_speaker}'.\n"
-            "   - Add 3-4 bullet lines answering common search queries (e.g. ¿Cómo fortalecer la mente?, Técnicas para transformar tus hábitos).\n"
-            "   - End with: 'Suscríbete a Hábitos de Acero para tu dosis de disciplina, liderazgo y crecimiento personal.'\n\n"
+            "   - Add 3-4 bullet lines answering common search queries.\n"
+            "   - End with: 'Inscreva-se em Entre Fases e Aprendizados para mais reflexões, sabedoria e desenvolvimento pessoal.'\n\n"
             "3. TAGS (15-20 tags in the same language):\n"
-            f"   - Mix of specific tags (habitos de acero, dr mario, mario alonso puig, desarrollo personal, disciplina, {clean_speaker.lower()}) and top search queries.\n\n"
+            f"   - Mix of specific tags (entre fases e aprendizados, desenvolvimento pessoal, autoconhecimento, inteligencia emocional, {clean_speaker.lower()}) and top search queries.\n\n"
             "4. CATEGORY: 'Education'.\n\n"
             f"ORIGINAL TITLE: {original_title}\n"
             f"ORIGINAL DESCRIPTION SNIPPET: {original_description[:400]}\n"
@@ -469,8 +492,8 @@ def spin_motivational_metadata(
         raw_title = data.get("title", "")
         if is_generic_speaker:
             raw_title = re.sub(r'^(motivational\s+(?:speaker|leader|speech)\s*[:\-–—]\s*)', '', raw_title, flags=re.IGNORECASE).strip()
-            raw_title = re.sub(r'^(h[aá]bitos\s+de\s+acero\s*[:\-–—]\s*)', '', raw_title, flags=re.IGNORECASE).strip()
-            raw_title = re.sub(r'^(orador\s+motivacional\s*[:\-–—]\s*)', '', raw_title, flags=re.IGNORECASE).strip()
+            raw_title = re.sub(r'^(entre\s+fases(?:\s+e\s+aprendizados)?\s*[:\-–—]\s*)', '', raw_title, flags=re.IGNORECASE).strip()
+            raw_title = re.sub(r'^(especialistas\s*[:\-–—]\s*)', '', raw_title, flags=re.IGNORECASE).strip()
         elif clean_speaker:
             # Strip accidental "Speaker:" or "Dra. Speaker:" prefix from beginning if LLM generated it
             prefix_pattern = rf"^(?:dr\.?\s+|dra\.?\s+)?{re.escape(clean_speaker)}\s*[:\-–—]\s*"
@@ -484,9 +507,9 @@ def spin_motivational_metadata(
         desc = data.get("description", "")
         # Ensure description begins with hashtags if not already present
         if clean_speaker and not desc.strip().startswith("#"):
-            tag_line = f"#{clean_speaker.lower().replace(' ', '')} #habitosdeacero #desarrollopersonal #disciplina\n\n"
+            tag_line = f"#{clean_speaker.lower().replace(' ', '')} #entrefases #desenvolvimentopessoal #autoconhecimento\n\n"
             desc = tag_line + desc.strip()
-        tags = data.get("tags", ["habitos de acero", "dr mario", "desarrollopersonal", "disciplina"])
+        tags = data.get("tags", ["entre fases e aprendizados", "desenvolvimento pessoal", "autoconhecimento", "inteligencia emocional"])
         cat = data.get("category", "Education")
 
         print(f"[metadata_generator] Spun altered title: \"{title}\" (from \"{original_title[:45]}...\")")
